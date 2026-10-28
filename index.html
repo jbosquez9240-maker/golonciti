@@ -3,11 +3,11 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Golonciti Food Grill - Sistema POS</title>
   <style>
     /* ============================================
-   RESET & BASE
+   RESET & BASE (SIN DESBORDAMIENTO)
    ============================================ */
     *,
     *::before,
@@ -17,17 +17,18 @@
       padding: 0
     }
 
-    html {
-      font-size: 15px;
-      -webkit-tap-highlight-color: transparent
-    }
-
+    html,
     body {
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden;
+      font-size: 15px;
+      -webkit-tap-highlight-color: transparent;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background: #f0f2f5;
       color: #1f2937;
       min-height: 100vh;
-      overflow-x: hidden
+      min-height: 100dvh;
     }
 
     button {
@@ -44,18 +45,26 @@
       outline: none
     }
 
+    /* ============================================
+   BARRAS DESPLAZADORAS VISIBLES Y ESTILIZADAS
+   ============================================ */
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px
+      width: 8px;
+      height: 8px
     }
 
     ::-webkit-scrollbar-track {
-      background: #e5e7eb
+      background: #e2e8f0;
+      border-radius: 4px
     }
 
     ::-webkit-scrollbar-thumb {
-      background: #9ca3af;
-      border-radius: 3px
+      background: #94a3b8;
+      border-radius: 4px
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b
     }
 
     /* ============================================
@@ -74,12 +83,13 @@
       --green-dark: #15803d;
       --amber: #f59e0b;
       --blue: #2563eb;
+      --header-h: 56px;
       --shadow: 0 1px 3px rgba(0, 0, 0, .1), 0 1px 2px rgba(0, 0, 0, .06);
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1);
     }
 
     /* ============================================
-   HEADER / NAV
+   HEADER / NAV ADAPTABLE A CUALQUIER PANTALLA
    ============================================ */
     .app-header {
       background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
@@ -87,16 +97,25 @@
       padding: 0 1rem;
       display: flex;
       align-items: center;
-      gap: 1rem;
-      height: 56px;
+      justify-content: space-between;
+      gap: .75rem;
+      min-height: var(--header-h);
+      width: 100%;
       position: sticky;
       top: 0;
       z-index: 100;
       box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
     }
 
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
     .brand {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       font-weight: 800;
       letter-spacing: 1px;
       color: var(--red);
@@ -107,28 +126,36 @@
       color: var(--white);
       font-weight: 400;
       font-size: .85rem;
-      margin-left: .5rem
+      margin-left: .4rem
     }
 
     .nav-tabs {
       display: flex;
       gap: 2px;
       margin-left: auto;
-      height: 100%
+      height: var(--header-h);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-tabs::-webkit-scrollbar {
+      height: 3px
     }
 
     .nav-tab {
       background: transparent;
       color: #d1d5db;
-      padding: 0 1.1rem;
+      padding: 0 1rem;
       font-size: .85rem;
       font-weight: 600;
       height: 100%;
       display: flex;
       align-items: center;
+      justify-content: center;
       border-bottom: 3px solid transparent;
       transition: all .15s;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .nav-tab:hover {
@@ -139,7 +166,7 @@
     .nav-tab.active {
       color: var(--white);
       border-bottom-color: var(--red);
-      background: rgba(255, 255, 255, .08)
+      background: rgba(255, 255, 255, .1)
     }
 
     /* Cloud sync badge */
@@ -147,15 +174,16 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 3px 10px;
+      padding: 4px 10px;
       border-radius: 20px;
-      font-size: .72rem;
+      font-size: .7rem;
       font-weight: 700;
       transition: all .15s;
       text-transform: uppercase;
       letter-spacing: .3px;
       white-space: nowrap;
       user-select: none;
+      flex-shrink: 0;
     }
 
     .cloud-badge.online {
@@ -182,7 +210,10 @@
    POS VIEW
    ============================================ */
     .view {
-      display: none
+      display: none;
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden
     }
 
     .view.active {
@@ -191,8 +222,10 @@
 
     .pos-layout {
       display: grid;
-      grid-template-columns: 1fr 390px;
-      height: calc(100vh - 56px);
+      grid-template-columns: minmax(0, 1fr) 390px;
+      height: calc(100vh - var(--header-h));
+      height: calc(100dvh - var(--header-h));
+      width: 100%;
       overflow: hidden;
     }
 
@@ -202,6 +235,8 @@
       flex-direction: column;
       overflow: hidden;
       background: var(--white);
+      min-width: 0;
+      min-height: 0;
     }
 
     .search-bar {
@@ -216,10 +251,11 @@
 
     .search-bar input {
       width: 100%;
-      padding: 8px 14px;
+      min-width: 0;
+      padding: 8px 12px;
       border: 2px solid var(--gray-light);
       border-radius: 8px;
-      font-size: .88rem;
+      font-size: .86rem;
       background: var(--white);
       transition: border-color .15s;
     }
@@ -235,22 +271,25 @@
       border-radius: 8px;
       font-size: .8rem;
       font-weight: 700;
+      flex-shrink: 0;
     }
 
     .cat-tabs {
       display: flex;
-      gap: 4px;
+      gap: 6px;
       padding: 8px 10px;
       overflow-x: auto;
+      overflow-y: hidden;
       background: #f9fafb;
       border-bottom: 1px solid var(--gray-light);
       flex-shrink: 0;
+      -webkit-overflow-scrolling: touch;
     }
 
     .cat-tab {
-      padding: 8px 16px;
+      padding: 7px 14px;
       border-radius: 8px;
-      font-size: .82rem;
+      font-size: .8rem;
       font-weight: 700;
       background: var(--white);
       color: var(--dark2);
@@ -258,7 +297,8 @@
       white-space: nowrap;
       transition: all .12s;
       text-transform: uppercase;
-      letter-spacing: .5px;
+      letter-spacing: .4px;
+      flex-shrink: 0;
     }
 
     .cat-tab:hover {
@@ -276,32 +316,36 @@
     .menu-grid {
       flex: 1;
       overflow-y: auto;
+      overflow-x: hidden;
       padding: 10px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
       gap: 8px;
       align-content: start;
+      min-height: 0;
+      -webkit-overflow-scrolling: touch;
     }
 
     .menu-item {
       background: var(--white);
       border: 2px solid var(--gray-light);
       border-radius: 10px;
-      padding: 14px 10px;
+      padding: 12px 8px;
       text-align: center;
       transition: all .1s;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 80px;
+      min-height: 76px;
       user-select: none;
+      word-break: break-word;
     }
 
     .menu-item:hover {
       border-color: var(--red);
       background: var(--red-light);
-      transform: scale(1.02)
+      transform: scale(1.01)
     }
 
     .menu-item:active {
@@ -311,13 +355,13 @@
 
     .menu-item .item-name {
       font-weight: 700;
-      font-size: .88rem;
+      font-size: .85rem;
       margin-bottom: 4px;
       line-height: 1.2
     }
 
     .menu-item .item-price {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 800;
       color: var(--red)
     }
@@ -329,13 +373,14 @@
       display: flex;
       flex-direction: column;
       box-shadow: -2px 0 10px rgba(0, 0, 0, .05);
-      height: calc(100vh - 56px);
-      max-height: calc(100vh - 56px);
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
       overflow: hidden;
     }
 
     .order-header {
-      padding: 12px 16px;
+      padding: 10px 14px;
       background: var(--dark);
       color: var(--white);
       display: flex;
@@ -345,16 +390,16 @@
     }
 
     .order-header h3 {
-      font-size: 1rem;
+      font-size: .95rem;
       font-weight: 700
     }
 
     .btn-clear {
       background: var(--red);
       color: var(--white);
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: 6px;
-      font-size: .78rem;
+      font-size: .76rem;
       font-weight: 600;
     }
 
@@ -363,7 +408,7 @@
     }
 
     .order-note-box {
-      padding: 8px 12px;
+      padding: 6px 10px;
       background: #f8fafc;
       border-bottom: 1px solid var(--gray-light);
       flex-shrink: 0;
@@ -374,7 +419,7 @@
       padding: 7px 10px;
       border: 1px solid #cbd5e1;
       border-radius: 6px;
-      font-size: .83rem;
+      font-size: .82rem;
       background: var(--white);
     }
 
@@ -386,38 +431,20 @@
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 6px 8px 32px 8px;
+      padding: 6px 8px 16px 8px;
       min-height: 0;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior-y: contain;
     }
 
-    .order-items::-webkit-scrollbar {
-      width: 8px
-    }
-
-    .order-items::-webkit-scrollbar-track {
-      background: #f1f5f9;
-      border-radius: 4px
-    }
-
-    .order-items::-webkit-scrollbar-thumb {
-      background: #94a3b8;
-      border-radius: 4px
-    }
-
-    .order-items::-webkit-scrollbar-thumb:hover {
-      background: #64748b
-    }
-
     .order-item {
       display: grid;
-      grid-template-columns: auto 1fr auto auto;
+      grid-template-columns: auto minmax(0, 1fr) auto auto;
       gap: 8px;
       align-items: center;
-      padding: 10px 14px;
+      padding: 8px 10px;
       border-bottom: 1px solid #f3f4f6;
-      font-size: .85rem;
+      font-size: .84rem;
     }
 
     .order-item:hover {
@@ -431,10 +458,10 @@
     }
 
     .order-item .oi-qty button {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 6px;
-      font-size: 1rem;
+      font-size: .95rem;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -461,7 +488,7 @@
 
     .oi-qty span {
       font-weight: 700;
-      min-width: 22px;
+      min-width: 20px;
       text-align: center
     }
 
@@ -475,17 +502,17 @@
     .order-item .oi-sub {
       font-weight: 700;
       color: var(--dark);
-      min-width: 55px;
+      min-width: 50px;
       text-align: right
     }
 
     .order-item .oi-del {
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       background: #fee2e2;
       color: var(--red);
-      font-size: .85rem;
+      font-size: .8rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -497,23 +524,24 @@
     }
 
     .order-empty {
-      flex: 1;
+      height: 100%;
+      min-height: 110px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--gray);
-      font-size: .95rem;
+      font-size: .9rem;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
 
     .order-empty::before {
       content: '🍽️';
-      font-size: 2.5rem
+      font-size: 2.2rem
     }
 
     .order-footer {
-      padding: 14px 16px;
+      padding: 10px 14px;
       border-top: 2px solid var(--gray-light);
       background: #f9fafb;
       flex-shrink: 0;
@@ -522,9 +550,10 @@
     .order-total {
       display: flex;
       justify-content: space-between;
-      font-size: 1.4rem;
+      align-items: center;
+      font-size: 1.25rem;
       font-weight: 800;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .order-total .total-amount {
@@ -533,10 +562,10 @@
 
     .btn-confirm {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       background: var(--green);
       color: var(--white);
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 700;
       border-radius: 10px;
       transition: all .15s;
@@ -561,35 +590,45 @@
     }
 
     /* ============================================
-   ADMIN VIEW
+   CONTENEDORES Y TABLAS CON BARRAS DESPLAZADORAS
    ============================================ */
-    .admin-container {
-      max-width: 900px;
+    .admin-container,
+    .report-container,
+    .config-container {
+      width: 100%;
+      max-width: 960px;
       margin: 0 auto;
-      padding: 20px
+      padding: 16px;
     }
 
     .admin-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       flex-wrap: wrap;
       gap: 10px;
     }
 
-    .admin-header h2 {
-      font-size: 1.3rem;
+    .admin-header h2,
+    .report-container h2,
+    .config-container h2 {
+      font-size: 1.2rem;
       font-weight: 800;
-      color: var(--dark)
+      color: var(--dark);
+    }
+
+    .report-container h2,
+    .config-container h2 {
+      margin-bottom: 16px
     }
 
     .btn-primary {
       background: var(--red);
       color: var(--white);
-      padding: 10px 20px;
+      padding: 10px 16px;
       border-radius: 8px;
-      font-size: .9rem;
+      font-size: .86rem;
       font-weight: 700;
       transition: all .15s;
     }
@@ -602,9 +641,9 @@
     .btn-secondary {
       background: var(--dark2);
       color: var(--white);
-      padding: 10px 20px;
+      padding: 10px 16px;
       border-radius: 8px;
-      font-size: .9rem;
+      font-size: .86rem;
       font-weight: 700;
       transition: all .15s;
     }
@@ -614,56 +653,92 @@
       box-shadow: var(--shadow)
     }
 
+    /* Filtros de categorías con barra horizontal */
     .admin-filters {
       display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      align-items: center
+      gap: 6px;
+      margin-bottom: 14px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      align-items: center;
+      -webkit-overflow-scrolling: touch;
     }
 
-    .admin-table {
+    /* Tablas con Scroll Horizontal y Vertical garantizado */
+    .admin-table,
+    .report-table {
       width: 100%;
+      max-width: 100%;
       background: var(--white);
       border-radius: 12px;
-      overflow: hidden;
       box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 460px;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid var(--gray-light);
     }
 
-    .admin-table table {
+    .admin-table table,
+    .report-table table {
       width: 100%;
-      border-collapse: collapse
+      min-width: 520px;
+      border-collapse: collapse;
     }
 
-    .admin-table th {
+    #table-breakdown {
+      min-width: 300px;
+    }
+
+    .admin-table th,
+    .report-table th {
       background: var(--dark);
       color: var(--white);
-      padding: 12px 14px;
+      padding: 11px 12px;
       text-align: left;
-      font-size: .82rem;
+      font-size: .78rem;
       text-transform: uppercase;
-      letter-spacing: .5px;
+      letter-spacing: .4px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      white-space: nowrap;
     }
 
-    .admin-table td {
-      padding: 10px 14px;
+    .admin-table td,
+    .report-table td {
+      padding: 10px 12px;
       border-bottom: 1px solid #f3f4f6;
-      font-size: .88rem;
+      font-size: .85rem;
+      vertical-align: middle;
     }
 
-    .admin-table tr:hover td {
+    .admin-table tr:hover td,
+    .report-table tr:hover td {
       background: #f9fafb
+    }
+
+    .report-table tfoot td {
+      font-weight: 800;
+      background: #f8fafc;
+      font-size: .92rem;
+      position: sticky;
+      bottom: 0;
+      z-index: 1;
+      border-top: 2px solid var(--gray-light);
     }
 
     .admin-table .actions {
       display: flex;
-      gap: 6px
+      gap: 6px;
+      white-space: nowrap
     }
 
     .admin-table .actions button {
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
-      font-size: .78rem;
+      font-size: .76rem;
       font-weight: 600;
     }
 
@@ -686,6 +761,103 @@
     }
 
     /* ============================================
+   TARJETAS DE ESTADÍSTICAS Y REPORTES
+   ============================================ */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      border-left: 4px solid var(--red);
+      min-width: 0;
+    }
+
+    .stat-card.green {
+      border-left-color: var(--green)
+    }
+
+    .stat-card.amber {
+      border-left-color: var(--amber)
+    }
+
+    .stat-card.blue {
+      border-left-color: var(--blue)
+    }
+
+    .stat-card .stat-label {
+      font-size: .72rem;
+      color: var(--gray);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .3px
+    }
+
+    .stat-card .stat-value {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-top: 4px;
+      word-break: break-word
+    }
+
+    .report-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap
+    }
+
+    .btn-excel {
+      background: #217346;
+      color: var(--white);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: .86rem;
+      font-weight: 700;
+      transition: all .15s;
+    }
+
+    .btn-excel:hover {
+      background: #1a5c38;
+      box-shadow: var(--shadow)
+    }
+
+    .badge-pay {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: .73rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-pay.efectivo {
+      background: #dcfce7;
+      color: #15803d
+    }
+
+    .badge-pay.transferencia {
+      background: #dbeafe;
+      color: #1d4ed8
+    }
+
+    .scroll-hint {
+      font-size: .75rem;
+      color: var(--gray);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ============================================
    MODAL
    ============================================ */
     .modal-overlay {
@@ -696,6 +868,7 @@
       align-items: center;
       justify-content: center;
       z-index: 200;
+      padding: 16px;
       backdrop-filter: blur(2px);
     }
 
@@ -706,9 +879,11 @@
     .modal {
       background: var(--white);
       border-radius: 16px;
-      padding: 28px;
-      width: 90%;
-      max-width: 440px;
+      padding: 24px;
+      width: 100%;
+      max-width: 420px;
+      max-height: 90vh;
+      overflow-y: auto;
       box-shadow: var(--shadow-lg);
       animation: modalIn .2s ease;
     }
@@ -726,19 +901,19 @@
     }
 
     .modal h3 {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 800;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       color: var(--dark)
     }
 
     .form-group {
-      margin-bottom: 16px
+      margin-bottom: 14px
     }
 
     .form-group label {
       display: block;
-      font-size: .82rem;
+      font-size: .78rem;
       font-weight: 700;
       margin-bottom: 5px;
       color: var(--gray);
@@ -749,10 +924,10 @@
     .form-group input,
     .form-group select {
       width: 100%;
-      padding: 10px 14px;
+      padding: 10px 12px;
       border: 2px solid var(--gray-light);
       border-radius: 8px;
-      font-size: .95rem;
+      font-size: .92rem;
       transition: border-color .15s;
     }
 
@@ -765,180 +940,30 @@
       display: flex;
       gap: 10px;
       justify-content: flex-end;
-      margin-top: 20px
-    }
-
-    /* ============================================
-   REPORTS VIEW
-   ============================================ */
-    .report-container {
-      max-width: 950px;
-      margin: 0 auto;
-      padding: 20px
-    }
-
-    .report-container h2 {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--dark);
-      margin-bottom: 20px
-    }
-
-    .stat-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-
-    .stat-card {
-      background: var(--white);
-      border-radius: 12px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-      border-left: 4px solid var(--red);
-    }
-
-    .stat-card.green {
-      border-left-color: var(--green)
-    }
-
-    .stat-card.amber {
-      border-left-color: var(--amber)
-    }
-
-    .stat-card.blue {
-      border-left-color: var(--blue)
-    }
-
-    .stat-card .stat-label {
-      font-size: .76rem;
-      color: var(--gray);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .3px
-    }
-
-    .stat-card .stat-value {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--dark);
-      margin-top: 4px
-    }
-
-    .report-table {
-      width: 100%;
-      background: var(--white);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      margin-bottom: 20px;
-    }
-
-    .report-table table {
-      width: 100%;
-      border-collapse: collapse
-    }
-
-    .report-table th {
-      background: var(--dark);
-      color: var(--white);
-      padding: 12px 14px;
-      text-align: left;
-      font-size: .82rem;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-    }
-
-    .report-table td {
-      padding: 10px 14px;
-      border-bottom: 1px solid #f3f4f6;
-      font-size: .88rem;
-    }
-
-    .report-table tr:hover td {
-      background: #f9fafb
-    }
-
-    .report-table tfoot td {
-      font-weight: 800;
-      background: #f9fafb;
-      font-size: .95rem
-    }
-
-    .report-actions {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
+      margin-top: 18px;
       flex-wrap: wrap
-    }
-
-    .btn-excel {
-      background: #217346;
-      color: var(--white);
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: .9rem;
-      font-weight: 700;
-      transition: all .15s;
-    }
-
-    .btn-excel:hover {
-      background: #1a5c38;
-      box-shadow: var(--shadow)
-    }
-
-    .badge-pay {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: .75rem;
-      font-weight: 700;
-    }
-
-    .badge-pay.efectivo {
-      background: #dcfce7;
-      color: #15803d
-    }
-
-    .badge-pay.transferencia {
-      background: #dbeafe;
-      color: #1d4ed8
     }
 
     /* ============================================
    CONFIG VIEW
    ============================================ */
-    .config-container {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 20px
-    }
-
-    .config-container h2 {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--dark);
-      margin-bottom: 20px
-    }
-
     .config-section {
       background: var(--white);
       border-radius: 12px;
-      padding: 20px;
+      padding: 18px;
       box-shadow: var(--shadow);
       margin-bottom: 16px;
     }
 
     .config-section h3 {
-      font-size: 1rem;
+      font-size: .98rem;
       font-weight: 700;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       color: var(--dark2)
     }
 
     .config-section .form-group {
-      max-width: 400px
+      max-width: 420px
     }
 
     .config-btn-group {
@@ -951,9 +976,9 @@
     .btn-danger {
       background: var(--red);
       color: var(--white);
-      padding: 10px 20px;
+      padding: 10px 16px;
       border-radius: 8px;
-      font-size: .9rem;
+      font-size: .86rem;
       font-weight: 700;
     }
 
@@ -964,9 +989,9 @@
     .btn-success {
       background: var(--green);
       color: var(--white);
-      padding: 10px 20px;
+      padding: 10px 16px;
       border-radius: 8px;
-      font-size: .9rem;
+      font-size: .86rem;
       font-weight: 700;
     }
 
@@ -979,23 +1004,27 @@
    ============================================ */
     .toast-container {
       position: fixed;
-      top: 70px;
-      right: 20px;
+      top: 68px;
+      right: 16px;
+      left: 16px;
+      pointer-events: none;
       z-index: 300;
       display: flex;
       flex-direction: column;
+      align-items: flex-end;
       gap: 8px;
     }
 
     .toast {
-      padding: 12px 20px;
+      padding: 12px 18px;
       border-radius: 10px;
-      font-size: .88rem;
+      font-size: .85rem;
       font-weight: 600;
       color: var(--white);
       box-shadow: var(--shadow-lg);
       animation: toastIn .3s ease, toastOut .3s ease 2.5s forwards;
       max-width: 320px;
+      pointer-events: auto;
     }
 
     .toast.success {
@@ -1094,15 +1123,45 @@
     }
 
     /* ============================================
-   RESPONSIVE SMALL
+   RESPONSIVE: TABLETS Y CELULARES
    ============================================ */
     @media(max-width:900px) {
+      :root {
+        --header-h: 94px;
+      }
+
+      .app-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px 12px 0 12px;
+        gap: 6px;
+        min-height: var(--header-h);
+      }
+
+      .header-top {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .nav-tabs {
+        width: 100%;
+        margin-left: 0;
+        height: 42px;
+        justify-content: space-between;
+        border-top: 1px solid rgba(255, 255, 255, .1);
+      }
+
+      .nav-tab {
+        flex: 1;
+        padding: 0 6px;
+        font-size: .78rem;
+      }
+
       .pos-layout {
         grid-template-columns: 1fr;
-        grid-template-rows: 1fr 1fr;
-        height: calc(100vh - 56px);
-        max-height: calc(100vh - 56px);
-        overflow: hidden;
+        grid-template-rows: 52% 48%;
+        height: calc(100vh - var(--header-h));
+        height: calc(100dvh - var(--header-h));
       }
 
       .menu-panel {
@@ -1121,41 +1180,65 @@
       }
 
       .menu-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr))
+        grid-template-columns: repeat(auto-fill, minmax(125px, 1fr))
       }
     }
 
     @media(max-width:600px) {
-      .nav-tab {
-        padding: 0 .65rem;
-        font-size: .74rem
-      }
-
       .brand {
-        font-size: 1rem
+        font-size: 1.05rem
       }
 
       .brand span {
         display: none
       }
 
+      .nav-tab {
+        font-size: .73rem;
+        padding: 0 4px
+      }
+
       .menu-grid {
-        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
         gap: 6px;
         padding: 8px
       }
 
       .menu-item {
-        padding: 10px 6px;
-        min-height: 65px
+        padding: 8px 6px;
+        min-height: 64px
       }
 
       .menu-item .item-name {
-        font-size: .78rem
+        font-size: .76rem
+      }
+
+      .menu-item .item-price {
+        font-size: .9rem
       }
 
       .stat-cards {
-        grid-template-columns: 1fr 1fr
+        grid-template-columns: 1fr 1fr;
+        gap: 8px
+      }
+
+      .stat-card {
+        padding: 12px
+      }
+
+      .stat-card .stat-value {
+        font-size: 1.15rem
+      }
+
+      .admin-container,
+      .report-container,
+      .config-container {
+        padding: 12px
+      }
+
+      .report-actions button {
+        flex: 1;
+        text-align: center
       }
     }
 
@@ -1167,6 +1250,7 @@
       display: none;
       align-items: center;
       justify-content: center;
+      padding: 16px;
       z-index: 250;
     }
 
@@ -1177,10 +1261,10 @@
     .confirm-box {
       background: var(--white);
       border-radius: 16px;
-      padding: 28px;
+      padding: 24px;
       text-align: center;
       max-width: 390px;
-      width: 92%;
+      width: 100%;
       box-shadow: var(--shadow-lg);
       animation: modalIn .2s ease;
     }
@@ -1192,7 +1276,7 @@
     }
 
     .confirm-box .confirm-total {
-      font-size: 1.9rem;
+      font-size: 1.85rem;
       font-weight: 800;
       color: var(--red);
       margin: 6px 0 16px
@@ -1208,7 +1292,7 @@
     .pay-btn {
       padding: 12px 10px;
       border-radius: 10px;
-      font-size: .9rem;
+      font-size: .88rem;
       font-weight: 700;
       border: 2px solid var(--gray-light);
       background: var(--white);
@@ -1225,7 +1309,8 @@
     .confirm-box .confirm-actions {
       display: flex;
       gap: 10px;
-      justify-content: center
+      justify-content: center;
+      flex-wrap: wrap
     }
   </style>
 </head>
@@ -1234,7 +1319,7 @@
 
   <!-- ========== HEADER ========== -->
   <header class="app-header">
-    <div style="display:flex;align-items:center;gap:12px">
+    <div class="header-top">
       <div class="brand">🔥 GOLONCITI <span>Food Grill</span></div>
       <div id="cloud-badge" class="cloud-badge local" title="Estado de sincronización en tiempo real">
         <span class="badge-dot"></span> <span id="cloud-badge-text">Conectando...</span>
@@ -1254,8 +1339,8 @@
     <div class="pos-layout">
       <div class="menu-panel">
         <div class="search-bar">
-          <input type="text" id="pos-search"
-            placeholder="🔍 Buscar plato rápidamente (ej: Hamburguesa, Alitas, Batido...)" oninput="renderMenuGrid()">
+          <input type="text" id="pos-search" placeholder="🔍 Buscar plato (ej: Hamburguesa, Alitas, Batido...)"
+            oninput="renderMenuGrid()">
           <button class="btn-clear-search" onclick="clearSearch()" title="Limpiar búsqueda">✕</button>
         </div>
         <div class="cat-tabs" id="cat-tabs"></div>
@@ -1295,6 +1380,7 @@
         </div>
       </div>
       <div class="admin-filters" id="admin-filters"></div>
+      <div class="scroll-hint">↔️ Desliza la tabla si deseas ver más opciones</div>
       <div class="admin-table">
         <table>
           <thead>
@@ -1317,9 +1403,9 @@
       <h2>📊 Cierre del Día — <span id="daily-date"></span></h2>
       <div class="stat-cards" id="daily-stats"></div>
 
-      <h3 style="font-size:1rem;font-weight:700;margin-bottom:12px">Desglose de Platos Vendidos</h3>
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px">Desglose de Platos Vendidos</h3>
       <div class="report-table">
-        <table>
+        <table id="table-breakdown">
           <thead>
             <tr>
               <th>Plato</th>
@@ -1335,7 +1421,9 @@
         <button class="btn-primary" onclick="printDailyReport()">🖨️ Imprimir Cierre</button>
         <button class="btn-excel" onclick="exportDailyExcel()">📗 Exportar Excel</button>
       </div>
-      <h3 style="font-size:1rem;font-weight:700;margin:20px 0 12px">Tickets del Día</h3>
+
+      <h3 style="font-size:1rem;font-weight:700;margin:20px 0 6px">Tickets del Día</h3>
+      <div class="scroll-hint">↔️ Desliza hacia los lados para ver los platos, total y botones de acción</div>
       <div class="report-table">
         <table>
           <thead>
@@ -1361,6 +1449,7 @@
       <h2>📅 Reporte Semanal (Últimos 7 días)</h2>
       <div class="stat-cards" id="weekly-stats"></div>
 
+      <div class="scroll-hint">↔️ Desliza horizontalmente para ver el desglose completo</div>
       <div class="report-table">
         <table>
           <thead>
@@ -1449,7 +1538,7 @@
         <h3>ℹ️ Acerca del Sistema</h3>
         <p style="font-size:.88rem;color:var(--gray);line-height:1.6">
           <strong>Golonciti Food Grill - Sistema POS Cloud</strong><br>
-          Versión 2.0 · Sincronización en Tiempo Real con Firebase Activa<br>
+          Versión 2.1 · Diseño Responsivo Multi-Dispositivo + Firebase Activo<br>
           Toda factura incluye IVA %
         </p>
       </div>
@@ -1509,7 +1598,7 @@
       </div>
       <div class="confirm-actions">
         <button class="btn-secondary" onclick="closeConfirm()">Cancelar</button>
-        <button class="btn-success" onclick="confirmSale()" style="padding:12px 26px;font-size:1rem">✅ Confirmar e
+        <button class="btn-success" onclick="confirmSale()" style="padding:12px 24px;font-size:.95rem">✅ Confirmar e
           Imprimir</button>
       </div>
     </div>
@@ -1648,7 +1737,6 @@
 
       let id = 1;
       const items = [
-        // COMIDAS RÁPIDAS
         { id: id++, name: 'Papi Pollo', price: 3.00, category: 'Comidas Rápidas' },
         { id: id++, name: 'Salchipapa', price: 2.50, category: 'Comidas Rápidas' },
         { id: id++, name: 'Papi Camarón', price: 5.00, category: 'Comidas Rápidas' },
@@ -1657,22 +1745,18 @@
         { id: id++, name: 'Crispy de Pollo', price: 5.00, category: 'Comidas Rápidas' },
         { id: id++, name: 'Verdi Pollo', price: 3.00, category: 'Comidas Rápidas' },
 
-        // HAMBURGUESAS
         { id: id++, name: 'Hamburguesa Sencilla', price: 2.00, category: 'Hamburguesas' },
         { id: id++, name: 'Hamburguesa Doble', price: 3.00, category: 'Hamburguesas' },
         { id: id++, name: 'Hamburguesa Grande', price: 5.00, category: 'Hamburguesas' },
 
-        // TACOS
         { id: id++, name: 'Taco de Pollo', price: 3.50, category: 'Tacos' },
         { id: id++, name: 'Taco de Camarón', price: 4.00, category: 'Tacos' },
         { id: id++, name: 'Taco de Carne', price: 3.50, category: 'Tacos' },
 
-        // ALITAS / PECHUGUITAS
         { id: id++, name: 'Alitas BBQ', price: 5.00, category: 'Alitas / Pechuguitas' },
         { id: id++, name: 'Alitas Maracuyá', price: 5.00, category: 'Alitas / Pechuguitas' },
         { id: id++, name: 'Alitas Miel y Mostaza', price: 5.00, category: 'Alitas / Pechuguitas' },
 
-        // PARRILLADAS
         { id: id++, name: 'Parrillada Mini', price: 7.50, category: 'Parrilladas' },
         { id: id++, name: 'Parrillada Media', price: 16.00, category: 'Parrilladas' },
         { id: id++, name: 'Parrillada Grande', price: 30.00, category: 'Parrilladas' },
@@ -1681,30 +1765,25 @@
         { id: id++, name: 'Costilla BBQ', price: 7.00, category: 'Parrilladas' },
         { id: id++, name: 'Costilla', price: 6.00, category: 'Parrilladas' },
 
-        // CORTES PREMIUM ($8.00 c/u)
         { id: id++, name: 'Picaña', price: 8.00, category: 'Cortes Premium' },
         { id: id++, name: 'Lomo Fino', price: 8.00, category: 'Cortes Premium' },
         { id: id++, name: 'Ribeye', price: 8.00, category: 'Cortes Premium' },
         { id: id++, name: 'T-Bone', price: 8.00, category: 'Cortes Premium' },
         { id: id++, name: 'Tomahawk', price: 8.00, category: 'Cortes Premium' },
 
-        // ASADOS
         { id: id++, name: 'Chuleta Pollo', price: 5.00, category: 'Asados' },
         { id: id++, name: 'Chuleta Carne', price: 5.50, category: 'Asados' },
 
-        // MIXTOS
         { id: id++, name: 'Carne + Pollo', price: 6.00, category: 'Mixtos' },
         { id: id++, name: 'Chuleta + Pollo', price: 7.00, category: 'Mixtos' },
         { id: id++, name: 'Chuleta + Carne', price: 7.00, category: 'Mixtos' },
 
-        // MAR Y TIERRA
         { id: id++, name: 'Langostinos', price: 9.00, category: 'Mar y Tierra' },
         { id: id++, name: 'Filete', price: 12.00, category: 'Mar y Tierra' },
         { id: id++, name: 'Conchas', price: 7.50, category: 'Mar y Tierra' },
         { id: id++, name: 'Arroz Mix Mariscos', price: 8.00, category: 'Mar y Tierra' },
         { id: id++, name: 'Mini de Mariscos', price: 16.00, category: 'Mar y Tierra' },
 
-        // ADICIONALES
         { id: id++, name: 'Moro', price: 2.50, category: 'Adicionales' },
         { id: id++, name: 'Arroz con Choclo', price: 3.00, category: 'Adicionales' },
         { id: id++, name: 'Arroz con Menestra', price: 2.00, category: 'Adicionales' },
@@ -1713,10 +1792,8 @@
         { id: id++, name: 'Porción de Papas', price: 2.50, category: 'Adicionales' },
         { id: id++, name: 'Porción de Yuca', price: 3.00, category: 'Adicionales' },
 
-        // PLATO TRIPLE
         { id: id++, name: 'Plato Triple (Costilla+Pollo+Carne)', price: 10.00, category: 'Plato Triple' },
 
-        // MILKSHAKE
         { id: id++, name: 'Milkshake Oreo', price: 2.50, category: 'Milkshake' },
         { id: id++, name: 'Milkshake Café', price: 2.50, category: 'Milkshake' },
         { id: id++, name: 'Milkshake Chocolate', price: 2.50, category: 'Milkshake' },
@@ -1728,7 +1805,6 @@
         { id: id++, name: 'Milkshake Maracumango', price: 3.00, category: 'Milkshake' },
         { id: id++, name: 'Milkshake Durazno', price: 3.00, category: 'Milkshake' },
 
-        // BATIDOS ($1.50 c/u)
         { id: id++, name: 'Batido de Mora', price: 1.50, category: 'Batidos' },
         { id: id++, name: 'Batido de Mango', price: 1.50, category: 'Batidos' },
         { id: id++, name: 'Batido de Melón', price: 1.50, category: 'Batidos' },
@@ -1743,7 +1819,6 @@
         { id: id++, name: 'Batido de Taxo', price: 1.50, category: 'Batidos' },
         { id: id++, name: 'Batido de Guayaba', price: 1.50, category: 'Batidos' },
 
-        // FRAPÉ ($1.75 c/u)
         { id: id++, name: 'Frapé de Fresa', price: 1.75, category: 'Frapé' },
         { id: id++, name: 'Frapé de Maracuyá', price: 1.75, category: 'Frapé' },
         { id: id++, name: 'Frapé de Mora', price: 1.75, category: 'Frapé' },
@@ -1753,12 +1828,10 @@
         { id: id++, name: 'Frapé de Guanábana', price: 1.75, category: 'Frapé' },
         { id: id++, name: 'Frapé de Naranjilla', price: 1.75, category: 'Frapé' },
 
-        // JARRAS DE JUGO
         { id: id++, name: 'Jarra Pequeña', price: 1.50, category: 'Jarras de Jugo' },
         { id: id++, name: 'Jarra Mediana', price: 2.00, category: 'Jarras de Jugo' },
         { id: id++, name: 'Jarra Grande', price: 2.50, category: 'Jarras de Jugo' },
 
-        // COCTELES
         { id: id++, name: 'Michelada', price: 3.50, category: 'Cocteles' },
         { id: id++, name: 'Margarita', price: 5.00, category: 'Cocteles' },
         { id: id++, name: 'Piña Colada', price: 7.00, category: 'Cocteles' },
@@ -2085,7 +2158,7 @@
         filterDiv.innerHTML += '<button class="cat-tab' + (adminFilter === c ? ' active' : '') + '" onclick="setAdminFilter(\'' + c.replace(/'/g, "\\'") + '\')">' + c + ' (' + count + ')</button>';
       });
       if (adminFilter) {
-        filterDiv.innerHTML += `<button class="btn-delete" style="padding:8px 12px;border-radius:8px;font-size:.78rem;font-weight:700" onclick="deleteCategory('${adminFilter.replace(/'/g, "\\'")}')">🗑️ Eliminar categoría "${adminFilter}"</button>`;
+        filterDiv.innerHTML += `<button class="btn-delete" style="padding:7px 12px;border-radius:8px;font-size:.76rem;font-weight:700;flex-shrink:0" onclick="deleteCategory('${adminFilter.replace(/'/g, "\\'")}')">🗑️ Eliminar "${adminFilter}"</button>`;
       }
 
       let items = adminFilter ? menu.filter(i => i.category === adminFilter) : menu;
@@ -2264,15 +2337,15 @@
         const badgeClass = payMethod === 'Transferencia' ? 'transferencia' : 'efectivo';
         return `<tr>
       <td><strong>#${String(s.ticketNum).padStart(4, '0')}</strong></td>
-      <td>${time}</td>
-      <td>${s.note ? '<strong>' + s.note + '</strong>' : '<span style="color:#9ca3af">—</span>'}</td>
+      <td style="white-space:nowrap">${time}</td>
+      <td style="min-width:110px">${s.note ? '<strong>' + s.note + '</strong>' : '<span style="color:#9ca3af">—</span>'}</td>
       <td><span class="badge-pay ${badgeClass}">${payMethod}</span></td>
-      <td style="font-size:.8rem;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${itemList}">${itemList}</td>
-      <td><strong>$${Number(s.total).toFixed(2)}</strong></td>
+      <td style="font-size:.8rem;min-width:180px;max-width:260px">${itemList}</td>
+      <td style="white-space:nowrap"><strong>$${Number(s.total).toFixed(2)}</strong></td>
       <td>
-        <div style="display:flex;gap:6px">
-          <button class="btn-edit" style="padding:5px 9px;border-radius:6px" onclick="reprintTicket(${s.id})" title="Reimprimir Ticket">🖨️</button>
-          <button class="btn-delete" style="padding:5px 9px;border-radius:6px" onclick="deleteTicket(${s.id})" title="Anular Ticket">🗑️</button>
+        <div style="display:flex;gap:6px;white-space:nowrap">
+          <button class="btn-edit" style="padding:6px 10px;border-radius:6px" onclick="reprintTicket(${s.id})" title="Reimprimir Ticket">🖨️</button>
+          <button class="btn-delete" style="padding:6px 10px;border-radius:6px" onclick="deleteTicket(${s.id})" title="Anular Ticket">🗑️</button>
         </div>
       </td>
     </tr>`;
@@ -2411,7 +2484,7 @@
         const dateStr = d.toLocaleDateString('es-EC', { day: '2-digit', month: '2-digit' });
         const isToday = day === todayStr;
         return `<tr${isToday ? ' style="background:#fef3c7;font-weight:700"' : ''}>
-      <td>${dayName}${isToday ? ' (HOY)' : ''}</td>
+      <td style="white-space:nowrap">${dayName}${isToday ? ' (HOY)' : ''}</td>
       <td>${dateStr}</td>
       <td>${dayTickets}</td>
       <td>$${dayEf.toFixed(2)}</td>
@@ -2576,7 +2649,6 @@
         }
         firebaseDb = firebase.database();
 
-        // Monitorear estado de conexión real con el servidor de Firebase
         firebaseDb.ref('.info/connected').on('value', snap => {
           isCloudConnected = (snap.val() === true);
           updateCloudStatusBadge(isCloudConnected);
@@ -2592,7 +2664,6 @@
     function listenToFirebaseRealtime() {
       if (!firebaseDb) return;
 
-      // Ventas en tiempo real
       firebaseDb.ref('sales').on('value', snapshot => {
         const cloudSales = snapshot.val();
         if (cloudSales !== null) {
@@ -2611,7 +2682,6 @@
         }
       });
 
-      // Menú en tiempo real
       firebaseDb.ref('menu').on('value', snapshot => {
         const cloudMenu = snapshot.val();
         if (cloudMenu !== null) {
@@ -2631,7 +2701,6 @@
         }
       });
 
-      // Categorías en tiempo real
       firebaseDb.ref('categories').on('value', snapshot => {
         const cloudCats = snapshot.val();
         if (cloudCats !== null) {
@@ -2650,7 +2719,6 @@
         }
       });
 
-      // Configuración en tiempo real
       firebaseDb.ref('config').on('value', snapshot => {
         const cloudCfg = snapshot.val();
         if (cloudCfg !== null) {
